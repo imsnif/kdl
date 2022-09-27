@@ -140,3 +140,23 @@ are valid queries:
     * -> `[("winapi", "1.0.0", "./crates/my-winapi-fork"), ("miette", "2.0.0", None)]`
 * `dependencies > [] => (name(), values(), props())`
     * -> `[("winapi", ["1.0.0"], {"platform": "windows"}), ("miette", ["2.0.0"], {"dev": true})]`
+
+## Full Grammar
+
+Note: for rules that are not defined in this grammar, see [the KDL grammar](https://github.com/kdl-org/kdl/blob/main/SPEC.md#full-grammar).
+
+```
+query := alternatives (q-ws* "=>" query-mapping)?
+alternatives := selector q-ws* "||" q-ws* alternatives | selector
+selector := filter q-ws* selector-operator q-ws* selector | filter
+selector-operator := ">" | "+" | "~" | ""
+filter := matcher+
+matcher := "top()"| "()" | identifier | type | accessor-matcher
+accessor-matcher := "[" (comparison | accessor)? "]"
+comparison := accessor q-ws* matcher-operator q-ws* (type | string | number | keyword)
+accessor := "val(" number ")" | "prop(" identifier ")" | "name()" | "tag()" | "values()" | "props()" | identifier
+matcher-operator := "=" | "!=" | ">" | "<" | ">=" | "<=" | "^=" | "$=" | "*="
+query-mapping := accessor | "(" accessor ("," q-ws* accessor)* ")"
+
+q-ws := bom | unicode-space
+```
